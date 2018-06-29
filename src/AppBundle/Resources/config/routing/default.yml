@@ -7,3 +7,8 @@ default_teste:
     path: /teste
     defaults: { _controller: "AppBundle:Default:teste"}
     methods: GET
+
+default_login:
+    path: /login
+    defaults: { _controller: "AppBundle:Default:login"}
+    methods: POST
