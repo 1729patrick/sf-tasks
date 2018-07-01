@@ -66,11 +66,6 @@ class DefaultController extends Controller
     }
 
 
-
-
-
-
-
     public function testeAction() {
 
         $em = $this->getDoctrine()->getManager();
