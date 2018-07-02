@@ -41,21 +41,21 @@ class DefaultController extends Controller
 
 
             $emailConstraint = new Assert\Email();
-            $emailConstraint->message = "Email inválido.";
-            $validate_email = $this->get("validator")->validate($email, $emailConstraint);
+            $emailConstraint->message = "This email is not valid.";
+            $validateEmail = $this->get("validator")->validate($email, $emailConstraint);
+            $pwd = hash('sha256', $password);
 
-            if($email != null && $password != null && count($validate_email) == 0){
+
+            if($email != null && $password != null && count($validateEmail) == 0){
 
                 $jwtAuth = $this->get(JwtAuth::class);
 
-            if ($getHash == null || $getHash == false) {
-                    $signup = $jwtAuth->signup($email, $password);
+                if ($getHash == null || $getHash == false) {
+                    $signup = $jwtAuth->signup($email, $pwd);
                 }else {
-                    $signup = $jwtAuth->signup($email, $password, true);
+                    $signup = $jwtAuth->signup($email, $pwd, true);
                 }
-
-
-               return  $helpers->json($signup);
+                return  $helpers->json($signup);
 
             }else{
                 $data = array(
@@ -70,7 +70,7 @@ class DefaultController extends Controller
 
 
     public function provasAction(Request $request) {
-        
+
         $token = $request->get('authorization', null);
 
         $helpers = $this->get(Helpers::class);
@@ -97,3 +97,4 @@ class DefaultController extends Controller
 
 
 }
+
