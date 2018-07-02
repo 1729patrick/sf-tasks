@@ -24,7 +24,6 @@ class DefaultController extends Controller
     public function loginAction(Request $request) {
         $helpers = $this->get(Helpers::class);
 
-
         $data = array(
             'status' => 'error'
         );
@@ -38,6 +37,7 @@ class DefaultController extends Controller
 
             $email = isset($params->email) ? $params->email: null;
             $password = isset($params->password) ? $params->password: null;
+            $getHash = isset($params->getHash) ? $params->getHash: null;
 
 
             $emailConstraint = new Assert\Email();
@@ -46,18 +46,21 @@ class DefaultController extends Controller
 
             if($email != null && $password != null && count($validate_email) == 0){
 
-                $jwt_auth = $this->get(JwtAuth::class);
+                $jwtAuth = $this->get(JwtAuth::class);
 
-                $credentials = $jwt_auth->signup($email, $password);
+            if ($getHash == null || $getHash == false) {
+                    $signup = $jwtAuth->signup($email, $password);
+                }else {
+                    $signup = $jwtAuth->signup($email, $password, true);
+                }
 
-                $data = array(
-                    'status' => 'success',
-                    'credentials' => $credentials
-                );
+
+               return  $helpers->json($signup);
+
             }else{
                 $data = array(
                     'status' => 'error',
-                    'email' => 'email incorrect'
+                    'data' => 'email incorrect'
                 );
             }
         }
@@ -66,19 +69,30 @@ class DefaultController extends Controller
     }
 
 
-    public function testeAction() {
-
-        $em = $this->getDoctrine()->getManager();
-        $userRepo = $em -> getRepository('BackendBundle:User');
-        $users = $userRepo -> findAll();
+    public function provasAction(Request $request) {
+        
+        $token = $request->get('authorization', null);
 
         $helpers = $this->get(Helpers::class);
+        $jwtAuth = $this->get(JwtAuth::class);
 
-        return $helpers->json(array(
-            'status'=> 'success',
-            'users'=>  $users
-        ));
+        if ($token && $jwtAuth->checkToken($token)){
+            $em = $this->getDoctrine()->getManager();
+            $userRepo = $em -> getRepository('BackendBundle:User');
+            $users = $userRepo -> findAll();
 
+
+            return $helpers->json(array(
+                'status'=> 'success',
+                'users'=>  $users
+            ));
+        }else {
+            return $helpers->json(array(
+                'status'=> 'error',
+                'code'=> '400',
+                'data'=>  'Authorization not valid.'
+            ));
+        }
     }
 
 

@@ -9,6 +9,7 @@ class Helpers {
         $this->manager = $manager;
     }
 
+    //converte array para json
     public function json($data)  {
         $normalizers = array(new \Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer());
         $encoders = array('json' => new \Symfony\Component\Serializer\Encoder\JsonEncoder());
